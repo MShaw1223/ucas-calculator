@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>UCAS Points Calculator</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                font-family: sans-serif;
+                background: #959595;
+            }
+            form {
+                background: gray;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                padding: 20px;
+                border: 2px solid black;
+                border-radius: 10px;
+            }
+            .title {
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            h3 {
+                margin: 3px;
+            }
+            input {
+                padding: 8px;
+                margin: 2px;
+                border-radius: 4px;
+            }
+            #output {
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                color: #333;
+                text-align: center;
+            }
+            button {
+                padding: 10px 20px;
+                border: none;
+                background-color: black;
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #333;
+            }
+            .div-class {
+                display: flex;
+                flex-direction: column;
+            }
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <form class="calculator">
+            <h1 class="title">Calculate Results and UCAS points</h1>
+            <select
+                name="choice"
+                id="selector"
+                onchange="choiceChange(document.getElementById('selector').value)"
+            >
+                <option>Select Your choice</option>
+                <option id="result" value="r">Results to Points</option>
+                <option id="point" value="p">Points to Results</option>
+            </select>
+            <div id="resultToPoint" class="div-class hidden">
+                <h3>Enter results in the format: 'XYZ'</h3>
+                <input
+                    type="text"
+                    id="inputResults"
+                    placeholder="Format: ABC"
+                /><br />
+                <button type="button" onclick="splitResults()">
+                    Calculate
+                </button>
+            </div>
+
+            <div id="pointToResult" class="div-class hidden">
+                <h3>Enter UCAS Points:</h3>
+                <input
+                    type="number"
+                    id="inputPoints"
+                    placeholder="UCAS Points"
+                /><br />
+                <button type="button" onclick="pointsToResults()">
+                    Calculate
+                </button>
+            </div>
+
+            <h3>Output</h3>
+            <input
+                type="text"
+                id="output"
+                value=""
+                placeholder="UCAS points"
+                readonly
+            />
+        </form>
+        <script>
+            function choiceChange(choice) {
+                document
+                    .getElementById("resultToPoint")
+                    .classList.add("hidden");
+                document
+                    .getElementById("pointToResult")
+                    .classList.add("hidden");
+                if (choice === "r") {
+                    document
+                        .getElementById("resultToPoint")
+                        .classList.remove("hidden");
+                } else if (choice === "p") {
+                    document
+                        .getElementById("pointToResult")
+                        .classList.remove("hidden");
+                }
+            }
+            function splitResults() {
+                let input = document
+                    .getElementById("inputResults")
+                    .value.trim()
+                    .toUpperCase();
+
+                let array = input.split("");
+
+                let ucas_pts = 0;
+
+                for (let i = 0; i < array.length; i++) {
+                    switch (array[i]) {
+                        case "A":
+                            ucas_pts += 48;
+                            break;
+                        case "B":
+                            ucas_pts += 40;
+                            break;
+                        case "C":
+                            ucas_pts += 32;
+                            break;
+                        case "D":
+                            ucas_pts += 24;
+                            break;
+                        case "E":
+                            ucas_pts += 16;
+                            break;
+                        case "A*":
+                            ucas_pts += 56;
+                            break;
+                        default:
+                            console.log("Invalid input: " + array[i]);
+                    }
+                }
+                document.getElementById("output").value = ucas_pts;
+            }
+            function pointsToResults() {
+                let points = parseInt(
+                    document.getElementById("inputPoints").value,
+                );
+
+                // dictionary of grades
+                let possibleGrades = {
+                    "A*": 0,
+                    A: 0,
+                    B: 0,
+                    C: 0,
+                    D: 0,
+                    E: 0,
+                };
+                // Arr of dicts
+                let gradeThresholds = [
+                    { grade: "A*", points: 56 },
+                    { grade: "A", points: 48 },
+                    { grade: "B", points: 40 },
+                    { grade: "C", points: 32 },
+                    { grade: "D", points: 24 },
+                    { grade: "E", points: 16 },
+                ];
+
+                let grades = [];
+
+                let remainingPoints = points;
+
+                for (
+                    let i = 0;
+                    i < gradeThresholds.length && grades.length < 3;
+                    i++
+                ) {
+                    let { grade, points: threshold } = gradeThresholds[i];
+
+                    while (remainingPoints >= threshold && grades.length < 3) {
+                        possibleGrades[grade] += 1;
+                        remainingPoints -= threshold;
+                        grades.push(grade);
+                    }
+                }
+                console.log(grades);
+                document.getElementById("output").value = grades.join("");
+            }
+        </script>
+    </body>
+</html>
+bcc acd
